@@ -1,14 +1,14 @@
-const express = require("express");
-const session = require('express-session');
-const logger = require('morgan');
-const passport = require("passport");
+const express   = require("express");
+const session   = require('express-session');
+const logger    = require('morgan');
+const passport  = require("passport");
 const sequelize = require('./config/database');
 
 const SequelizeStore = require('connect-session-sequelize')(session.Store);
 
 require('dotenv').config();
 
-const app = express();
+const app  = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
@@ -40,6 +40,6 @@ app.use((req, res, next) => {
     next();
 })
 
-app.use('./routes/login');
+app.use('./routes/auth');
 
 app.listen(port, () => console.log("Server on port:", port));
