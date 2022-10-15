@@ -1,77 +1,47 @@
+const passport      = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
+const sequelize     = require('./database');
+const User          = sequelize.models.User;
+const { validPassword } = require('../lib/passwordUtils');
 
-const mysql = require('mysql2');
-const bcrypt = require('bcrypt');
-const dbconfig = require('./database');
-const conn = mysql.createConnection(dbconfig.connection);
+const customFields = {
+    usernameField: 'email',
+    passwordField: 'password'
+};
 
-conn.query('USE ' + dbconfig.database);
+const verifyCallBack = async (username, password, done) => {
+    
+    User.findOne({where: {email: username}})
+        .then((acc) => {
+            if (!acc) { return done(null, false) }
 
-module.exports = (passport) => {
-    passport.serializeUser((user, done) => {
-        done(null, user.id);
-    });
+            const isValid = validPassword(password, acc.password, acc.salt);
 
-    passport.deserializeUser((id, done) => {
-        conn.query('SELECT * FROM cuentas WHERE id = ? ',[id], (err, rows) => {
-            done(err, rows[0]);
+            if (isValid) {
+                return done(null, acc);
+            } else {
+                return done(null, false);
+            }
+        })
+        .catch((err) => {
+            done(err);
         });
-    });
-
-    passport.use(
-        'local-singup',
-        new LocalStrategy({
-            usernameField: 'username',
-            passwordField: 'password',
-            passReqToCallback: true
-        },
-        (req, username, password, done) => {
-            conn.query('SELECT * FROM cuentas WHERE username = ?',
-            [username], (err, rows) => {
-                if (err)
-                    return done(err);
-                if (rows.length) {
-                    return done(null, false, 
-                        req.flash('signupMessage', 'Usuario ya esta en uso'));
-                } else {
-                    const newUser = {
-                        username: username,
-                        passport: bcrypt.hashSync(password, bcrypt.genSaltSync(10))
-                    };
-
-                    const insertQuery = 'INSERT INTO cuentas (username, password) VALUES (?,?)';
-
-                    conn.query(insertQuery,[newUser.username, newUser.password], (err, rows) => {
-                        newUser.id = rows.insertId;
-
-                        return done(null, newUser);
-                    });
-                }
-            });
-        })
-    );
-
-    passport.use(
-        'local-login',
-        new LocalStrategy({
-            usernameField: 'username',
-            passwordField: 'password',
-            passReqToCallback: true
-        },
-        (req, username, password, done) => {
-            conn.query('SELECT * FROM cuentas WHERE username = ?',
-            [username], (err, rows) => {
-                if (err)
-                    return done(err);
-                if (!rows.length) {
-                    return done(null, false, req.flash('loginMessage', 'Usuario o contraseña equivocados'));
-                }
-
-                if (!bcrypt.compareSync(password, rows[0].password))
-                    return done(null, false, req.flash('loginMessage', 'Usuario o contraseña equivocados'))
-
-                return done(null, rows[0]);
-            });
-        })
-    );
 }
+
+const strategy = new LocalStrategy(customFields, verifyCallBack);
+
+passport.use(strategy);
+
+passport.serializeUser((user, done) => {
+    done(null, user.id)
+});
+
+passport.deserializeUser((userId, done) => {
+    User.findByPk(userId)
+        .then((user) => {
+            done(null, user);
+        })
+        .catch((err) => {
+            done(err);
+        });
+});
