@@ -2,7 +2,7 @@ const router    = require('express').Router();
 const passport  = require('passport');
 const sequelize = require('../config/database');
 const User      = sequelize.models.User;
-const { genPassword }     = require('../lib/passwordUtils');
+const { genPassword } = require('../lib/passwordUtils');
 
 router.post('/login', passport.authenticate('local'), (req, res) => {
     if (!req.user) return res.sendStatus(401);
@@ -23,8 +23,11 @@ router.post('/register', async (req, res) => {
     res.sendStatus(201);
 });
 
-router.get('/logout', (req, res, next) => {
-    req.logout();
+router.post('/logout', (req, res, next) => {
+    req.logout((err) => {
+        if (err) return next(err);
+        res.sendStatus(200);
+    });
 })
 
 module.exports = router;
