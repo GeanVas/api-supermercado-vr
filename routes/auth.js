@@ -3,14 +3,13 @@ const passport  = require('passport');
 const sequelize = require('../config/database');
 const User      = sequelize.models.User;
 const { genPassword }     = require('../lib/passwordUtils');
-const { isAdmin, isAuth } = require('../middlewares/auth');
 
-router.post('/login/password', passport.authenticate('local', {
-    successRedirect: '/',
-    failureRedirect: '/login'
-}));
+router.post('/login', passport.authenticate('local'), (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    res.sendStatus(200);
+});
 
-router.post('/register', async (req, res, next) => {
+router.post('/register', async (req, res) => {
     const saltHash = genPassword(req.body.password);
 
     const salt = saltHash.salt;
@@ -21,8 +20,7 @@ router.post('/register', async (req, res, next) => {
         password: password,
         salt: salt
     });
-    // res.redirect('/login');
-    res.status(201).send({msg: 'Usuario creado'});
+    res.sendStatus(201);
 });
 
 router.get('/logout', (req, res, next) => {
