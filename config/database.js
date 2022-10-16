@@ -13,6 +13,14 @@ const sequelize = new Sequelize(db_name, db_uname, db_pw, {
 // const Account = require('../models/account')(sequelize);
 const User = require('../models/user')(sequelize);
 const Product = require('../models/product')(sequelize);
+const Cart = sequelize.define('Cart');
+
+User.hasOne(Cart);
+Cart.belongsTo(User);
+
+// TODO: Product quantity
+Cart.belongsToMany(Product, {through: 'cartProducts', as: 'Product'});
+Product.belongsToMany(Cart, {through: 'cartProducts', as: 'Cart'});
 
 sequelize.sync().then(() => console.log('DB sync'));
 
