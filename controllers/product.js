@@ -1,9 +1,18 @@
-const Product = require('../models/product');
+const sequelize = require('../config/database');
+const Product = sequelize.models.Product;
 
-const getProducts = (req, res) => {
-
+const getProducts = async (req, res) => {
+    const products = await Product.findAll();
+    req.json(products);
 }
 
-const getProductById = (req, res) => {
-    
+const getProductById = async (req, res) => {
+    const pk = req.params.id;
+    const product = await Product.findByPk(pk);
+    req.json(product);
 }
+
+module.exports = {
+    getProducts,
+    getProductById
+};
