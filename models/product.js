@@ -7,12 +7,10 @@ module.exports = (sequelize) => {
             allowNull: false
         },
         expDate: {
-            type: DataTypes.DATE,
-            allowNull: false
+            type: DataTypes.DATE
         },
         elabDate: {
-            type: DataTypes.DATE,
-            allowNull: false
+            type: DataTypes.DATE
         },
         stock: {
             type: DataTypes.INTEGER,
