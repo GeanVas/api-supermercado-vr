@@ -41,5 +41,6 @@ app.use((req, res, next) => {
 })
 
 app.use(require('./routes/auth'));
+app.use(require('./routes/index'));
 
 app.listen(port, () => console.log("Server on port:", port));
