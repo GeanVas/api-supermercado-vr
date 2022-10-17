@@ -1,5 +1,4 @@
 const router = require('express').Router();
-const { Model } = require('sequelize');
 const product = require('../controllers/product');
 const {isAuth, isAdmin} = require('../middlewares/auth');
 
