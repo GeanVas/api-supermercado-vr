@@ -40,6 +40,9 @@ app.use((req, res, next) => {
     next();
 })
 
+app.get('/', (req, res, next) => {
+    res.json({msj: 'Hola Mundo'});
+})
 app.use(require('./routes/auth'));
 app.use(require('./routes/index'));
 
