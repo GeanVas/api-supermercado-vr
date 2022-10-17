@@ -5,8 +5,8 @@ const User      = sequelize.models.User;
 const { genPassword } = require('../lib/passwordUtils');
 
 router.post('/login', passport.authenticate('local'), (req, res) => {
-    if (!req.user) return res.sendStatus(401);
-    res.sendStatus(200);
+    if (!req.user) return res.status(401).json({msj: 'error'}); 
+    res.status(200).json({msj: 'ok'});
 });
 
 router.post('/register', async (req, res) => {
@@ -15,18 +15,22 @@ router.post('/register', async (req, res) => {
     const salt = saltHash.salt;
     const password = saltHash.hash;
 
-    await User.create({
+    const user = await User.create({
         email: req.body.email,
         password: password,
         salt: salt
     });
-    res.sendStatus(201);
+    if (!user) return res.status().json({msj: 'error'})
+    res.status(201).json({msj: 'created'});
 });
-
+// TODO revisar porque siempre tira 200
 router.post('/logout', (req, res, next) => {
     req.logout((err) => {
-        if (err) return next(err);
-        res.sendStatus(200);
+        if (err) {
+            res.json({msj: err})
+            return next(err);
+        }
+        res.status(200).json({ok: 200});
     });
 })
 
