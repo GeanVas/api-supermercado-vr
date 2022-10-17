@@ -2,6 +2,10 @@ const router = require('express').Router();
 const product = require('../controllers/product');
 const {isAuth, isAdmin} = require('../middlewares/auth');
 
+router.get('/', (req, res) => {
+    res.send('Hola Mundo');
+})
+
 router.get('/productos', product.getProducts);
 
 router.get('/producto:id', product.getProductById);
