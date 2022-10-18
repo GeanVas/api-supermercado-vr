@@ -20,17 +20,25 @@ router.post('/register',
         const salt = saltHash.salt;
         const password = saltHash.hash;
 
-        const user = await User.create({
-            email: req.body.email,
-            password: password,
-            salt: salt
+        const user = await User.findOne({
+            where: {email: req.body.email}
         });
 
-        if (!user) 
-            return res.status().json({msj: 'error'})
-        
-        res.status(201).json({msj: 'created'});
-});
+        if (!user) {
+            const newUser = await User.create({
+                email: req.body.email,
+                password: password,
+                salt: salt
+            });
+    
+            if (!newUser) 
+                return res.status(500).json({msj: 'No se pudo crear el usuario'});
+            
+            res.status(201).json({msj: 'created'});
+        } else 
+            res.status(400).json({msj: 'Correo ya esta en uso'});
+    }
+);
 // TODO revisar porque siempre tira 200
 router.post('/logout', (req, res, next) => {
     req.logout((err) => {
