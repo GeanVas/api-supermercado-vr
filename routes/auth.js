@@ -2,6 +2,7 @@ const router    = require('express').Router();
 const passport  = require('passport');
 const sequelize = require('../config/database');
 const User      = sequelize.models.User;
+const { isAuth } = require('../middlewares/auth');
 const { genPassword } = require('../lib/passwordUtils');
 const { signupValidation, signupSchema } = require('../middlewares/auth');
 
@@ -25,22 +26,19 @@ router.post('/register',
         });
 
         if (!user) {
-            const newUser = await User.create({
+            User.create({
                 email: req.body.email,
                 password: password,
                 salt: salt
-            });
-    
-            if (!newUser) 
-                return res.status(500).json({msj: 'No se pudo crear el usuario'});
-            
-            res.status(201).json({msj: 'created'});
+            })
+            .then(user => res.status(201).json(user))
+            .catch(err => res.status(500).json({msj: err}));
         } else 
             res.status(400).json({msj: 'Correo ya esta en uso'});
     }
 );
 // TODO revisar porque siempre tira 200
-router.post('/logout', (req, res, next) => {
+router.post('/logout', isAuth, (req, res, next) => {
     req.logout((err) => {
         if (err) {
             res.json({msj: err})
