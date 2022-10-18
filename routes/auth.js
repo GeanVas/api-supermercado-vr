@@ -3,25 +3,33 @@ const passport  = require('passport');
 const sequelize = require('../config/database');
 const User      = sequelize.models.User;
 const { genPassword } = require('../lib/passwordUtils');
+const { signupValidation, signupSchema } = require('../middlewares/auth');
 
 router.post('/login', passport.authenticate('local'), (req, res) => {
-    if (!req.user) return res.status(401).json({msj: 'error'}); 
+    if (!req.user) 
+        return res.status(401).json({msj: 'error'}); 
     res.status(200).json({msj: 'ok'});
 });
 
-router.post('/register', async (req, res) => {
-    const saltHash = genPassword(req.body.password);
+router.post('/register', 
+    signupSchema,
+    signupValidation,
+    async (req, res) => {
+        const saltHash = genPassword(req.body.password);
 
-    const salt = saltHash.salt;
-    const password = saltHash.hash;
+        const salt = saltHash.salt;
+        const password = saltHash.hash;
 
-    const user = await User.create({
-        email: req.body.email,
-        password: password,
-        salt: salt
-    });
-    if (!user) return res.status().json({msj: 'error'})
-    res.status(201).json({msj: 'created'});
+        const user = await User.create({
+            email: req.body.email,
+            password: password,
+            salt: salt
+        });
+
+        if (!user) 
+            return res.status().json({msj: 'error'})
+        
+        res.status(201).json({msj: 'created'});
 });
 // TODO revisar porque siempre tira 200
 router.post('/logout', (req, res, next) => {

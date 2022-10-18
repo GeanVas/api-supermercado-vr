@@ -13,11 +13,13 @@ const verifyCallBack = async (username, password, done) => {
     
     User.findOne({where: {email: username}})
         .then((acc) => {
-            if (!acc) { return done(null, false) }
+            if (!acc) 
+                return done(null, false)
 
             const isValid = validPassword(password, acc.password, acc.salt);
 
-            if (!isValid) return done(null, false)
+            if (!isValid) 
+                return done(null, false)
             
             return done(null, acc)
         })
