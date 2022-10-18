@@ -9,12 +9,16 @@ router.get('/', (req, res) => {
 
 router.get('/productos', product.getProducts);
 
-router.get('/producto:id', product.getProductById);
+router.get('/producto/:id', product.getProductById);
+
+router.get('/productos/:categoria', product.getProductsByCategory);
 
 router.post('/producto', product.createProduct);
 
 router.post('/checkout', isAuth, );
 
 router.get('/usuarios', user.getUsers)
+
+router.get('/usuario/:id', user.getUserById);
 
 module.exports = router;
