@@ -40,7 +40,7 @@ app.use((req, res, next) => {
     next();
 })
 
-app.use('/', require('./routes/auth'));
-app.use('/', require('./routes/index'));
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api', require('./routes/index'));
 
 app.listen(port, () => console.log("Server on port:", port));
