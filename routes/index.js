@@ -1,6 +1,7 @@
 const router  = require('express').Router();
 const product = require('../controllers/product');
 const user    = require('../controllers/user');
+const order   = require('../controllers/order');
 const {isAuth, isAdmin} = require('../middlewares/auth');
 const uploadFile = require('../lib/uploadFile');
 
@@ -16,6 +17,6 @@ router.post('/producto', uploadFile.single('image'), product.addProduct);
 router.get('/usuarios', user.getUsers)
 router.get('/usuario/:id', user.getUserById);
 
-router.post('/checkout', isAuth, uploadFile.none());
+router.post('/checkout', isAuth, uploadFile.none(), order.createOrder);
 
 module.exports = router;
