@@ -11,17 +11,18 @@ const sequelize = new Sequelize(db_name, db_uname, db_pw, {
     logging: false
 });
 
-// const Account = require('../models/account')(sequelize);
-const User = require('../models/user')(sequelize);
-const Product = require('../models/product')(sequelize);
-const Cart = sequelize.define('Cart');
+const User          = require('../models/user')(sequelize);
+const Product       = require('../models/product')(sequelize);
+const OrderDetail   = require('../models/orderDetail')(sequelize);
+const Order         = require('../models/order')(sequelize);
 
-// User.hasOne(Cart);
-// Cart.belongsTo(User);
+// User 1:M Order
+User.hasMany(Order);
+Order.belongsTo(User);
 
-// // TODO: Product quantity
-// Cart.belongsToMany(Product, {through: 'CartProducts', as: 'Product'});
-// Product.belongsToMany(Cart, {through: 'CartProducts', as: 'Cart'});
+// Product M:N Order
+Order.belongsToMany(Product, {through: OrderDetail});
+Product.belongsToMany(Order, {through: OrderDetail});
 
 sequelize.sync().then(() => console.log('DB sync'));
 

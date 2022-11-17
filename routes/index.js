@@ -8,7 +8,7 @@ router.get('/', (req, res) => {
     res.send('Hola Mundo');
 })
 
-router.get('/productos', product.getProducts);
+router.get('/productos', isAuth, product.getProducts);
 router.get('/producto/:id', product.getProductById);
 router.get('/productos/:categoria', product.getProductsByCategory);
 router.post('/producto', uploadFile.single('image'), product.addProduct);
